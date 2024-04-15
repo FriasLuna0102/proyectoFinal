@@ -160,6 +160,13 @@ public class UrlControlador extends ControladorClass {
             if(codigo.equalsIgnoreCase("listlol")){
                 return;
             }
+
+            if(codigo.equalsIgnoreCase("list")){
+                return;
+            }
+
+
+
                 ShortURL shorurl = URLODM.getInstance().buscarUrlByCodig(codigo);
 
                 // Registrar información sobre la solicitud
