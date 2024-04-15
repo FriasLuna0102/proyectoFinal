@@ -96,8 +96,9 @@ public class ShortURL {
 
     // URL corta debe ser nombre de dominio + id
 	public String shortener(String codigo){
-		return "https://proyectofinal.friasluna.me:7000/" + codigo;
+		return "https://proyectofinal.friasluna.me/:7000/" + codigo;
 	}
+
 
 	public String getId() {
 		return id;
