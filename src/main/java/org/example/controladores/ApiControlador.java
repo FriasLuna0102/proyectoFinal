@@ -38,7 +38,7 @@ public class ApiControlador extends ControladorClass {
 
 
         app.get("/list/{nombre}", context -> {
-            String nombre = context.pathParam("nombre");
+            String nombre = context.queryParam("nombre");
             if (nombre == null || nombre.isEmpty()) {
                 // Si el parámetro está ausente o es una cadena vacía, devolver un error 400 Bad Request
                 context.status(400).result("El parámetro 'nombre' es requerido.");

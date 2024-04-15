@@ -114,7 +114,7 @@ public class Main {
 
         // Enviar la solicitud POST con los datos JSON
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI("http://localhost:7000/login"))
+                .uri(new URI("https://proyectofinal.friasluna.me/login"))
                 .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(jsonObject)))
                 .build();
 
