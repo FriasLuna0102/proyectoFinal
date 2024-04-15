@@ -1,12 +1,11 @@
 package org.example.controladores;
 
-import com.github.siyoon210.ogparser4j.OgParser;
-import com.github.siyoon210.ogparser4j.OpenGraph;
 import io.javalin.Javalin;
 import org.example.encapsulaciones.EstadisticaURL;
 import org.example.encapsulaciones.ShortURL;
 import org.example.encapsulaciones.Usuario;
 import org.example.encapsulaciones.Visitante;
+import org.example.servicios.URLServices;
 import org.example.servicios.UsuarioServices;
 import org.example.servicios.mongo.EstadisticaODM;
 import org.example.servicios.mongo.URLODM;
@@ -14,15 +13,14 @@ import org.example.servicios.mongo.UsuarioODM;
 import org.example.servicios.mongo.VisitanteODM;
 import org.example.utils.ControladorClass;
 
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
@@ -37,39 +35,6 @@ public class UrlControlador extends ControladorClass {
         super(app);
     }
 
-    public String imgToBase64(String imgUrl) throws MalformedURLException {
-        OgParser ogParser = new OgParser();
-        String imgBase64 = null;
-        try {
-            OpenGraph openGraph = ogParser.getOpenGraphOf(imgUrl);
-
-            URL url = new URL(openGraph.getContentOf("image").getValue());
-            URLConnection conn = url.openConnection();
-            InputStream inputStream = conn.getInputStream();
-            BufferedInputStream bis = new BufferedInputStream(inputStream);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            int bytesRead;
-            while ((bytesRead = bis.read()) != -1) {
-                baos.write(bytesRead);
-            }
-
-            byte[] imageBytes = baos.toByteArray();
-            imgBase64 = Base64.getEncoder().encodeToString(imageBytes);
-        }catch (Exception ignored){}
-
-        return imgBase64;
-    }
-
-    public String obtenerMimeType(String imgUrl){
-        OgParser ogParser = new OgParser();
-        String mimetype = null;
-        try {
-            OpenGraph openGraph = ogParser.getOpenGraphOf(imgUrl);
-            mimetype = openGraph.getContentOf("image").getExtraDataValueOf("type");
-        }catch (Exception ignored){}
-
-        return mimetype;
-    }
 
     @Override
     public void aplicarRutas() {
@@ -81,46 +46,46 @@ public class UrlControlador extends ControladorClass {
 //        URLServices.getInstancia().crearUrl(new ShortURL("ddd","www.com","com",date,esta,"foto"));
 
         app.routes(() -> {
-           path("/url", () -> {
+            path("/url", () -> {
 
 
-               post("generar", context -> {
-                   String url = context.formParam("urlBase");
-                   ShortURL shortURL = URLODM.getInstance().buscarUrlByUrlLarga(url);
+                post("generar", context -> {
+                    String url = context.formParam("urlBase");
+                    ShortURL shortURL = URLODM.getInstance().buscarUrlByUrlLarga(url);
 
-                   if (shortURL == null){
-                       shortURL = new ShortURL(url,imgToBase64(url), obtenerMimeType(url));
-                       URLODM.getInstance().guardarURL(shortURL);
-                       usuarioLogueado = UsuarioServices.getInstancia().getUsuarioLogueado();
-                       if (usuarioLogueado != null){
-                           usuarioLogueado.getUrlList().add(shortURL);
-                           UsuarioODM.getInstance().guardarUsuario(usuarioLogueado);
-                       }else {
-                           UsuarioServices.getInstancia().getVisitanteActual().getUrlList().add(shortURL);
-                           VisitanteODM.getInstance().guardarVisitante(UsuarioServices.getInstancia().getVisitanteActual());
-                       }
-                   }
+                    if (shortURL == null){
+                        shortURL = new ShortURL(url,null);
+                        URLODM.getInstance().guardarURL(shortURL);
+                        usuarioLogueado = UsuarioServices.getInstancia().getUsuarioLogueado();
+                        if (usuarioLogueado != null){
+                            usuarioLogueado.getUrlList().add(shortURL);
+                            UsuarioODM.getInstance().guardarUsuario(usuarioLogueado);
+                        }else {
+                            UsuarioServices.getInstancia().getVisitanteActual().getUrlList().add(shortURL);
+                            VisitanteODM.getInstance().guardarVisitante(UsuarioServices.getInstancia().getVisitanteActual());
+                        }
+                    }
 
-                   EstadisticaURL estadisticaURL = new EstadisticaURL(shortURL);
-                   EstadisticaODM.getInstance().guardarEstadistica(estadisticaURL);
-                   context.result(shortURL.getUrlCorta());
-               });
+                    EstadisticaURL estadisticaURL = new EstadisticaURL(shortURL);
+                    EstadisticaODM.getInstance().guardarEstadistica(estadisticaURL);
+                    context.result(shortURL.getUrlCorta());
+                });
 
-               get("misUrl", cxt ->{
-                   Map<String, Object> model = new HashMap<>();
-                   usuarioLogueado = UsuarioServices.getInstancia().getUsuarioLogueado();
-                   if (usuarioLogueado != null){
-                       if (usuarioLogueado.isUser()){
-                           listUrlsBase = usuarioLogueado.getUrlList();
-                       }else {
-                           listUrlsBase = URLODM.getInstance().obtenerTodasLasUrl();
-                       }
-                   }else {
+                get("misUrl", cxt ->{
+                    Map<String, Object> model = new HashMap<>();
+                    usuarioLogueado = UsuarioServices.getInstancia().getUsuarioLogueado();
+                    if (usuarioLogueado != null){
+                        if (usuarioLogueado.isUser()){
+                            listUrlsBase = usuarioLogueado.getUrlList();
+                        }else {
+                            listUrlsBase = URLODM.getInstance().obtenerTodasLasUrl();
+                        }
+                    }else {
                         listUrlsBase = UsuarioServices.getInstancia().getVisitanteActual().getUrlList();
-                   }
-                   model.put("listUrl", listUrlsBase);
-                   Usuario user = UsuarioServices.getInstancia().getUsuarioLogueado();
-                   model.put("usuario",user);
+                    }
+                    model.put("listUrl", listUrlsBase);
+                    Usuario user = UsuarioServices.getInstancia().getUsuarioLogueado();
+                    model.put("usuario",user);
 
 //                   List<ShortURL> lis = UsuarioServices.getInstancia().getVisitanteActual().getUrlList();
 //                   String idVisitante = UsuarioServices.getInstancia().getVisitanteActual().getId();
@@ -128,34 +93,33 @@ public class UrlControlador extends ControladorClass {
 //                   System.out.println("Visitante id: "+idVisitante);
 //                   VisitanteODM.getInstance().eliminarUrlDeVisitante(idVisitante,idUrl);
 
-                   cxt.render("publico/html/misUrl.html",model);
-               });
+                    cxt.render("publico/html/misUrl.html",model);
+                });
 
 
-               get("eliminarURL", cxt ->{
-                   String codigoUrl = cxt.queryParam("codigoUrl");
-                   ShortURL url = URLODM.getInstance().buscarUrlByCodig(codigoUrl);
+                get("eliminarURL", cxt ->{
+                    String codigoUrl = cxt.queryParam("codigoUrl");
+                    ShortURL url = URLODM.getInstance().buscarUrlByCodig(codigoUrl);
 
-                   List<ShortURL> lis = UsuarioServices.getInstancia().getVisitanteActual().getUrlList();
-                   String idVisitante = UsuarioServices.getInstancia().getVisitanteActual().getId();
-                   String idURL = url.getId();
+                    List<ShortURL> lis = UsuarioServices.getInstancia().getVisitanteActual().getUrlList();
+                    String idVisitante = UsuarioServices.getInstancia().getVisitanteActual().getId();
+                    String idURL = url.getId();
 
-                   for (ShortURL ur: lis){
+                    for (ShortURL ur: lis){
 
-                       if (ur.getCodigo().equals(url.getCodigo())){
-                           VisitanteODM.getInstance().eliminarUrlDeVisitante(idVisitante,idURL);
-                           URLODM.getInstance().eliminarUrl(url);
-                           System.out.println("Son iguales");
-                       }else {
-                           URLODM.getInstance().eliminarUrl(url);
-                       }
+                        if (ur.getCodigo().equals(url.getCodigo())){
+                            VisitanteODM.getInstance().eliminarUrlDeVisitante(idVisitante,idURL);
+                            URLODM.getInstance().eliminarUrl(url);
+                            System.out.println("Son iguales");
+                        }else {
+                            URLODM.getInstance().eliminarUrl(url);
+                        }
 
-                   }
-                   cxt.redirect("/");
-               });
+                    }
+                    cxt.redirect("/");
+                });
 
-           });
-
+            });
 
         });
 
@@ -196,38 +160,48 @@ public class UrlControlador extends ControladorClass {
             if(codigo.equalsIgnoreCase("listlol")){
                 return;
             }
-                ShortURL shorurl = URLODM.getInstance().buscarUrlByCodig(codigo);
 
-                // Registrar información sobre la solicitud
-                String userAgent = context.userAgent();
-                String ipAddress = context.ip();
-                String clientDomain = context.host();
-                String operatingSystem = parseOperatingSystem(userAgent);
-                String navegador = parseBrowser(userAgent);
-
-                EstadisticaURL estadisticaURL = EstadisticaODM.getInstance().buscarEstadisticaByCodigoOfUrl(shorurl.getCodigo());
+            if(codigo.equalsIgnoreCase("list")){
+                return;
+            }
 
 
-                estadisticaDatos(estadisticaURL,ipAddress,clientDomain,operatingSystem,navegador,dateTime);
+
+            ShortURL shorurl = URLODM.getInstance().buscarUrlByCodig(codigo);
+
+            // Registrar información sobre la solicitud
+            String userAgent = context.userAgent();
+            String ipAddress = context.ip();
+            String clientDomain = context.host();
+            String operatingSystem = parseOperatingSystem(userAgent);
+            String navegador = parseBrowser(userAgent);
+
+            EstadisticaURL estadisticaURL = EstadisticaODM.getInstance().buscarEstadisticaByCodigoOfUrl(shorurl.getCodigo());
+
+
+            estadisticaDatos(estadisticaURL,ipAddress,clientDomain,operatingSystem,navegador,dateTime);
 
             assert url != null;
-	        context.redirect(url);
+            context.redirect(url);
         });
 
     }
 
     private String obtenerContenidoServiceworker() {
         // Obtener la ruta del directorio actual
-        String rutaDirectorioActual = System.getProperty("user.dir");
+        //String rutaDirectorioActual = System.getProperty("user.dir");
 
         // Construir la ruta absoluta al archivo serviceworkers.js
-        String rutaArchivo = rutaDirectorioActual + "/src/main/resources/publico/serviceworkers.js";
+        //String rutaArchivo = rutaDirectorioActual + "/src/main/resources/publico/serviceworkers.js";
+
+        // Definir la ruta del archivo
+        String rutaArchivo = "/home/azureuser/proyectoFinal/src/main/resources/publico/serviceworkers.js";
 
         // Verificar si el archivo existe
         File archivo = new File(rutaArchivo);
         if (!archivo.exists() || archivo.isDirectory()) {
             // Manejar el caso en el que el archivo no exista o sea un directorio
-            System.err.println("El archivo serviceworkers.js no existe en la ruta especificada.");
+            System.err.println("El archivo serviceworkers.js no existe en la ruta especificada: " + rutaArchivo);
             return ""; // Retornar una cadena vacía o manejar el error de otra forma
         }
 
@@ -238,6 +212,7 @@ public class UrlControlador extends ControladorClass {
             e.printStackTrace();
             return ""; // Manejar el caso de error de lectura del archivo
         }
+
     }
 
 
