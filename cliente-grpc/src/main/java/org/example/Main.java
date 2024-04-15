@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class Main {
 	public static void main(String[] args) {
 
-		String host = "proyectofinal.friasluna.me";
+		String host = "localhost";
 		int puerto = 50051;
 
 		ManagedChannel channel = ManagedChannelBuilder

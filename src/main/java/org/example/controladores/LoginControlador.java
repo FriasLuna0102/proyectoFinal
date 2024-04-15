@@ -34,7 +34,7 @@ public class LoginControlador extends ControladorClass {
                 Usuario usuarioClient = UsuarioODM.getInstance().buscarUsuarioByUsername(nombreClient);
 
                 if (usuarioClient != null && usuarioClient.getPassword().equals(passClint)){
-                    //UsuarioServices.getInstancia().setUsuarioLogueado(usuarioClient);
+                    UsuarioServices.getInstancia().setUsuarioLogueado(usuarioClient);
                     String jwt = JWTutils.generateJwt(username);
 
                     // Enviar el JWT como una cookie

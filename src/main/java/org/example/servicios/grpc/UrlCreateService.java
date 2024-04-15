@@ -19,7 +19,6 @@ public class UrlCreateService extends UrlServiceGrpc.UrlServiceImplBase {
 		String username = request.getUsername();
 		String urlRequest = request.getUrlBase();
 		Usuario usuario = UsuarioODM.getInstance().buscarUsuarioByUsername(username);
-        System.out.println(usuario.getNombre());
 		ShortURL shortURL = URLODM.getInstance().buscarUrlByUrlLarga(urlRequest);
 		EstadisticaURL estadisticaUrl = new EstadisticaURL();
 

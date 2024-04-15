@@ -52,12 +52,15 @@ dependencies {
 
     implementation 'com.j2html:j2html:1.6.0'
 
+    //gRPC
     implementation "io.grpc:grpc-protobuf:${grpcVersion}"
     implementation "io.grpc:grpc-services:${grpcVersion}"
     implementation "io.grpc:grpc-stub:${grpcVersion}"
     implementation 'io.grpc:protoc-gen-grpc-java:1.62.2'
     runtimeOnly 'io.grpc:grpc-netty-shaded:1.62.2'
 
+    //Opengraph
+    implementation 'com.github.siyoon210:ogparser4j:1.0.1'
 
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'

@@ -1,11 +1,12 @@
 package org.example.controladores;
 
+import com.github.siyoon210.ogparser4j.OgParser;
+import com.github.siyoon210.ogparser4j.OpenGraph;
 import io.javalin.Javalin;
 import org.example.encapsulaciones.EstadisticaURL;
 import org.example.encapsulaciones.ShortURL;
 import org.example.encapsulaciones.Usuario;
 import org.example.encapsulaciones.Visitante;
-import org.example.servicios.URLServices;
 import org.example.servicios.UsuarioServices;
 import org.example.servicios.mongo.EstadisticaODM;
 import org.example.servicios.mongo.URLODM;
@@ -13,14 +14,15 @@ import org.example.servicios.mongo.UsuarioODM;
 import org.example.servicios.mongo.VisitanteODM;
 import org.example.utils.ControladorClass;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
@@ -35,6 +37,39 @@ public class UrlControlador extends ControladorClass {
         super(app);
     }
 
+    public String imgToBase64(String imgUrl) throws MalformedURLException {
+        OgParser ogParser = new OgParser();
+        String imgBase64 = null;
+        try {
+            OpenGraph openGraph = ogParser.getOpenGraphOf(imgUrl);
+
+            URL url = new URL(openGraph.getContentOf("image").getValue());
+            URLConnection conn = url.openConnection();
+            InputStream inputStream = conn.getInputStream();
+            BufferedInputStream bis = new BufferedInputStream(inputStream);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            int bytesRead;
+            while ((bytesRead = bis.read()) != -1) {
+                baos.write(bytesRead);
+            }
+
+            byte[] imageBytes = baos.toByteArray();
+            imgBase64 = Base64.getEncoder().encodeToString(imageBytes);
+        }catch (Exception ignored){}
+
+        return imgBase64;
+    }
+
+    public String obtenerMimeType(String imgUrl){
+        OgParser ogParser = new OgParser();
+        String mimetype = null;
+        try {
+            OpenGraph openGraph = ogParser.getOpenGraphOf(imgUrl);
+            mimetype = openGraph.getContentOf("image").getExtraDataValueOf("type");
+        }catch (Exception ignored){}
+
+        return mimetype;
+    }
 
     @Override
     public void aplicarRutas() {
@@ -54,7 +89,7 @@ public class UrlControlador extends ControladorClass {
                    ShortURL shortURL = URLODM.getInstance().buscarUrlByUrlLarga(url);
 
                    if (shortURL == null){
-                       shortURL = new ShortURL(url,null);
+                       shortURL = new ShortURL(url,imgToBase64(url), obtenerMimeType(url));
                        URLODM.getInstance().guardarURL(shortURL);
                        usuarioLogueado = UsuarioServices.getInstancia().getUsuarioLogueado();
                        if (usuarioLogueado != null){
@@ -121,6 +156,7 @@ public class UrlControlador extends ControladorClass {
 
            });
 
+
         });
 
 
@@ -160,13 +196,6 @@ public class UrlControlador extends ControladorClass {
             if(codigo.equalsIgnoreCase("listlol")){
                 return;
             }
-
-            if(codigo.equalsIgnoreCase("list")){
-                return;
-            }
-
-
-
                 ShortURL shorurl = URLODM.getInstance().buscarUrlByCodig(codigo);
 
                 // Registrar información sobre la solicitud
@@ -189,19 +218,16 @@ public class UrlControlador extends ControladorClass {
 
     private String obtenerContenidoServiceworker() {
         // Obtener la ruta del directorio actual
-        //String rutaDirectorioActual = System.getProperty("user.dir");
+        String rutaDirectorioActual = System.getProperty("user.dir");
 
         // Construir la ruta absoluta al archivo serviceworkers.js
-        //String rutaArchivo = rutaDirectorioActual + "/src/main/resources/publico/serviceworkers.js";
-
-        // Definir la ruta del archivo
-        String rutaArchivo = "/home/azureuser/proyectoFinal/src/main/resources/publico/serviceworkers.js";
+        String rutaArchivo = rutaDirectorioActual + "/src/main/resources/publico/serviceworkers.js";
 
         // Verificar si el archivo existe
         File archivo = new File(rutaArchivo);
         if (!archivo.exists() || archivo.isDirectory()) {
             // Manejar el caso en el que el archivo no exista o sea un directorio
-            System.err.println("El archivo serviceworkers.js no existe en la ruta especificada: " + rutaArchivo);
+            System.err.println("El archivo serviceworkers.js no existe en la ruta especificada.");
             return ""; // Retornar una cadena vacía o manejar el error de otra forma
         }
 
@@ -212,7 +238,6 @@ public class UrlControlador extends ControladorClass {
             e.printStackTrace();
             return ""; // Manejar el caso de error de lectura del archivo
         }
-
     }
 
 

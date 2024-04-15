@@ -24,8 +24,8 @@ public class Main {
     private static final HttpClient cliente = HttpClient.newBuilder().build();
 
     public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException {
-        urlApi = new URI("https://proyectofinal.friasluna.me/list/").toURL();
-        urlApiCrear = new URI("https://proyectofinal.friasluna.me/generar").toURL();
+        urlApi = new URI("http://localhost:7000/list/").toURL();
+        urlApiCrear = new URI("http://localhost:7000/generar").toURL();
         jwt = autenticarUsuario("lol","lol");
         Scanner scanner = new Scanner(System.in);
         boolean seguir = true;
@@ -114,7 +114,7 @@ public class Main {
 
         // Enviar la solicitud POST con los datos JSON
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI("https://proyectofinal.friasluna.me/login"))
+                .uri(new URI("http://localhost:7000/login"))
                 .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(jsonObject)))
                 .build();
 

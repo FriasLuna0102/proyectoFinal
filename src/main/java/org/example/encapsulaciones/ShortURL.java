@@ -17,7 +17,10 @@ public class ShortURL {
 	private String urlCorta;
 	private Date fechaCreacion;
 
-    private int contadorAccesos; // Contador de accesos
+	private EstadisticaURL estadisticas;
+	private String imgBase64;
+	private String mimeType;
+	private int contadorAccesos; // Contador de accesos
 
     // Constructor y otros métodos de la clase
 
@@ -61,7 +64,17 @@ public class ShortURL {
         this.imgBase64 = imgBase64;
         this.fechaCreacion = Date.from(Instant.now());
     }
-    public ShortURL(String id, String urlBase, String urlCorta, Date fechaCreacion, EstadisticaURL estadisticas, String imgBase64) {
+
+	public ShortURL(String urlBase, String imgBase64, String mimeType) {
+		this.urlBase = urlBase;
+		this.imgBase64 = imgBase64;
+		this.mimeType = mimeType;
+		this.codigo = generateUniqueId();
+		this.urlCorta = shortener(this.codigo);
+		this.fechaCreacion = Date.from(Instant.now());
+	}
+
+	public ShortURL(String id, String urlBase, String urlCorta, Date fechaCreacion, EstadisticaURL estadisticas, String imgBase64) {
         this.id = id;
         this.urlBase = urlBase;
         this.urlCorta = urlCorta;
@@ -74,8 +87,6 @@ public class ShortURL {
         this.id = id;
     }
 
-    private EstadisticaURL estadisticas;
-	private String imgBase64;
 
 
 
@@ -96,9 +107,8 @@ public class ShortURL {
 
     // URL corta debe ser nombre de dominio + id
 	public String shortener(String codigo){
-		return "https://proyectofinal.friasluna.me/" + codigo;
+		return "http://localhost:7000/" + codigo;
 	}
-
 
 	public String getId() {
 		return id;
@@ -122,5 +132,9 @@ public class ShortURL {
 
 	public String getImgBase64() {
 		return imgBase64;
+	}
+
+	public String getMimeType() {
+		return mimeType;
 	}
 }

@@ -1,5 +1,7 @@
 package org.example.servicios.grpc;
 
+import com.github.siyoon210.ogparser4j.OgParser;
+import com.github.siyoon210.ogparser4j.OpenGraph;
 import com.google.protobuf.Timestamp;
 import io.grpc.stub.StreamObserver;
 import org.example.encapsulaciones.EstadisticaURL;
@@ -116,7 +118,6 @@ public class UrlServiceImpl extends UrlServiceGrpc.UrlServiceImplBase {
 		String username = request.getUsername();
 		String urlRequest = request.getUrlBase();
 		Usuario usuario = UsuarioODM.getInstance().buscarUsuarioByUsername(username);
-        System.out.println(usuario.getNombre());
 		ShortURL shortURL = URLODM.getInstance().buscarUrlByUrlLarga(urlRequest);
 		EstadisticaURL estadisticaUrl = new EstadisticaURL();
 
@@ -126,7 +127,18 @@ public class UrlServiceImpl extends UrlServiceGrpc.UrlServiceImplBase {
 		}
 		// Manejar logica en caso de la url
 		if (shortURL == null){
-			shortURL = new ShortURL(urlRequest, null);
+
+			String imgUrl;
+			OgParser ogParser = new OgParser();
+			try {
+				OpenGraph openGraph = ogParser.getOpenGraphOf(urlRequest);
+				imgUrl = openGraph.getContentOf("image").getValue();
+
+				System.out.println(openGraph.getContentOf("image").getValue());
+			}catch (Exception e){
+				imgUrl = null;
+			}
+			shortURL = new ShortURL(urlRequest, imgUrl);
 			URLODM.getInstance().guardarURL(shortURL);
 			EstadisticaURL estadisticaURL = new EstadisticaURL(shortURL);
 			EstadisticaODM.getInstance().guardarEstadistica(estadisticaURL);
