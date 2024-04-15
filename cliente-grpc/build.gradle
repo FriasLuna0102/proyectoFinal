@@ -1,0 +1,56 @@
+plugins {
+    id 'java'
+    id 'com.google.protobuf' version '0.9.4' //plugin para incluir la compilación de gRPC, ver: https://github.com/grpc/grpc-java#generated-code
+    id 'application'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+mainClassName = 'org.example.Main'
+run.standardInput =  System.in
+
+def grpcVersion = '1.63.0' // CURRENT_GRPC_VERSION
+def protobufVersion = '3.25.1'
+def protocVersion = protobufVersion
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    //Librerías necesarias para para implementar gRPC y Protobuf, ver: https://github.com/grpc/grpc-java
+    runtimeOnly 'io.grpc:grpc-netty-shaded:1.62.2'
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+    implementation 'io.grpc:protoc-gen-grpc-java:1.62.2'
+    compileOnly 'org.apache.tomcat:annotations-api:6.0.53' // necessary for Java 9+
+    //implementation 'com.google.protobuf:protobuf-java:3.25.3'
+}
+
+//Tareas para la generación del código.
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.25.1"
+    }
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.62.2'
+        }
+    }
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
+
+    //generatedFilesBaseDir = "$projectDir/generated"
+}
+
+
+test {
+    useJUnitPlatform()
+}

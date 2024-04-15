@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Lista de URLs</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <style>
+        .url-list {
+            padding: 0;
+        }
+
+        .url-list-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .url-base {
+            font-weight: bold;
+        }
+
+        .url-corta {
+            color: #007bff;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+
+</head>
+
+<body>
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Lista de URLs</h1>
+    <ul class="list-group" id="urlList">
+        <!-- Aquí se mostrarán las URLs -->
+    </ul>
+</div>
+
+<script>
+    window.addEventListener('load', function() {
+        // Obtener el elemento del DOM donde se mostrarán las URLs
+        var urlList = document.querySelector('.list-group');
+
+        // Obtener las URLs de IndexedDB
+        localforage.getItem('urls').then(function(urls) {
+            // Si no hay URLs, no hacer nada
+            if (!urls) {
+                return;
+            }
+
+            // Para cada URL, crear un elemento del DOM y añadirlo a la lista
+            urls.forEach(function(url) {
+                var listItem = document.createElement('li');
+                listItem.className = 'list-group-item';
+
+                var row = document.createElement('div');
+                row.className = 'row';
+
+                var col1 = document.createElement('div');
+                col1.className = 'col-md-6';
+                var linkBase = document.createElement('a');
+                linkBase.className = 'url-base mb-0';
+                linkBase.href = url.urlBase;
+                linkBase.textContent = url.urlBase;
+                linkBase.style.wordBreak = 'break-all'; // Aplicar el estilo de word-break
+                col1.appendChild(linkBase);
+
+
+                var col2 = document.createElement('div');
+                col2.className = 'col-md-6 d-flex align-items-center justify-content-between';
+                var linkCorta = document.createElement('a');
+                linkCorta.className = 'url-corta';
+                linkCorta.href = url.urlCorta;
+                linkCorta.textContent = url.urlCorta;
+                col2.appendChild(linkCorta);
+
+                row.appendChild(col1);
+                row.appendChild(col2);
+
+                listItem.appendChild(row);
+
+                urlList.appendChild(listItem);
+            });
+        }).catch(function(err) {
+            console.error('Error al obtener las URLs: ', err);
+        });
+    });
+
+</script>
+</body>
+
+</html>

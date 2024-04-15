@@ -1,0 +1,59 @@
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th,
+td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+
+
+/* Estilos para el botón de atrás */
+.container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.back-button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.back-button:hover {
+    background-color: #0056b3;
+}
+
+
+
+
+
+
+/* Estilos para el botón */
+.styled-button {
+    background-color: #4CAF50;  /* Color de fondo */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: 0.3s;
+}
+
+/* Cambia el color de fondo cuando se pasa el mouse sobre el botón */
+.styled-button:hover {
+    background-color: #45a049;
+}

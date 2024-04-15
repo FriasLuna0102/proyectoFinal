@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Listado de Usuarios</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
+
+    <link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="../css/index.css">
+
+    <!-- Custom styles for this template -->
+    <link href="../css/sidebars.css" rel="stylesheet">
+
+    <link href="../css/administrarUsuarios.css" rel="stylesheet">
+
+
+
+
+
+</head>
+
+<body>
+<h2>Listado de Usuarios</h2>
+<table>
+    <thead>
+    <tr>
+        <!-- <th>Fecha de Creación</th> -->
+        <th>Nombre</th>
+        <th>Username</th>
+        <th>Password</th>
+        <th>Usuario</th>
+        <th>Opciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${listUsuarios}">
+        <td th:text="${user.getNombre}"></td>
+        <td th:text="${user.getUsername}"></td>
+        <td th:text="${user.getPassword}"></td>
+        <td th:text="${user.isUser}"></td>
+
+
+
+        <th:block>
+        <td th:unless="${user.getUsername} == ${usuario.getUsername}">
+<!--            <a th:href="'/plantillaGeneral/plantillaUsuarioModificar?username=' + ${user.getUsername}"><button type="button" class="btn btn-warning btn-sm">Modificar</button></a>-->
+
+            <div>
+                <a th:href="'/eliminarUsuario?username=' + ${user.getUsername}" th:if="${user.isUser == true}"><button type="button"
+                                                                                                                       class="btn btn-danger btn-sm">Eliminar</button>
+                </a>
+
+
+                <form th:action="'/cambiarPermisos?username=' + ${user.getUsername}" method="post">
+                    <input type="hidden" name="username" th:value="${user.getUsername}" />
+                    <button type="submit" class="btn btn-primary btn-sm">Cambiar Estado</button>
+                </form>
+            </div>
+
+
+
+
+        </td>
+        </th:block>
+    </tr>
+    </tbody>
+</table>
+
+<!--<div class="container" >-->
+
+<!--    <button class="styled-button" onclick="window.location.href = '/registrarUsuarios'" > Registrar Usuario</button>-->
+
+<!--</div>-->
+
+
+
+
+<script>
+    // Función para retroceder en la historia del navegador al hacer clic en el botón
+    function goBack() {
+        window.history.back();
+    }
+</script>
+
+</body>
+
+</html>

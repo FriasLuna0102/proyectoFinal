@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package org.example.grpc.org.example.url_service;
+
+import "google/protobuf/timestamp.proto";
+
+message ShortURL {
+  string id = 1;
+  string codigo = 2;
+  string urlBase = 3;
+  string urlCorta = 4;
+  google.protobuf.Timestamp fechaCreacion = 5;
+}
+
+message EstadisticaURL {
+  string id = 1;
+  int32 cantidadAccesos = 2;
+  map<string, int32> navegadores = 3;
+  map<string, int32> direccionesIP = 4;
+  map<string, int32> dominiosClientes = 5;
+  map<string, int32> plataformasSO = 6;
+  map<string, int32> horasAcceso = 7;
+  ShortURL shortURL = 8;
+}
+
+message UrlListRequest {
+  string username = 1;
+}
+
+message UrlListResponse {
+  repeated ShortURL urlList = 1;
+  repeated EstadisticaURL estadisticaUrlList = 2;
+}
+
+message UrlCreateRequest {
+  string username = 1;
+  string urlBase = 2;
+}
+
+message UrlCreateResponse {
+  ShortURL shortUrl = 1;
+  EstadisticaURL estadisticaUrl = 2;
+}
+
+service UrlService {
+  rpc listUrls(UrlListRequest) returns (UrlListResponse);
+  rpc createUrl(UrlCreateRequest) returns (UrlCreateResponse);
+}
+

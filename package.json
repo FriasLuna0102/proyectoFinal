@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@microlink/vanilla": "^5.5.19",
+    "microlinkjs": "^2.3.0"
+  }
+}

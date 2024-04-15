@@ -1,0 +1,90 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'com.google.protobuf' version '0.9.4'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+def grpcVersion = '1.63.0' // CURRENT_GRPC_VERSION
+def protobufVersion = '3.25.1'
+def protocVersion = protobufVersion
+
+mainClassName = 'org.example.Main'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    //Javalin y manejo de logs
+    implementation 'io.javalin:javalin:5.6.3'
+    implementation "org.slf4j:slf4j-simple:2.0.7"
+
+    //Para las plantillas:
+    implementation "io.javalin:javalin-rendering:5.6.0"
+    implementation 'org.thymeleaf:thymeleaf:3.1.2.RELEASE'
+    implementation 'io.javalin:javalin-rendering:5.3.2'
+
+    //Procesamiento JSON para Javalin.
+    implementation("com.fasterxml.jackson.core:jackson-core:2.15.2")
+    implementation('com.fasterxml.jackson.core:jackson-databind:2.15.2')
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    //ORM - Hibernate.
+    implementation 'org.hibernate.orm:hibernate-core:6.0.2.Final'
+
+    //Librería de MongoDB
+    // https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-sync
+    implementation group: 'org.mongodb', name: 'mongodb-driver-sync', version: '4.10.2'
+
+    //ODM (Object-Document Mapper)
+    implementation 'dev.morphia.morphia:morphia-core:2.1.7'
+    //implementation 'org.mongodb:bson:2.5.1'
+
+    //JWT
+    implementation 'com.auth0:java-jwt:3.3.0'
+
+    //librería faker
+    implementation 'net.datafaker:datafaker:2.0.1'
+
+    implementation 'com.j2html:j2html:1.6.0'
+
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-services:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+    implementation 'io.grpc:protoc-gen-grpc-java:1.62.2'
+    runtimeOnly 'io.grpc:grpc-netty-shaded:1.62.2'
+
+
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    //Para el manejo de json:
+    implementation 'com.google.code.gson:gson:2.8.8'
+
+    compileOnly 'org.apache.tomcat:annotations-api:6.0.53' // necessary for Java 9+
+
+}
+
+protobuf {
+    protoc { artifact = "com.google.protobuf:protoc:${protocVersion}" }
+    plugins {
+        grpc { artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}" }
+    }
+    generateProtoTasks {
+        all()*.plugins { grpc {} }
+    }
+}
+
+shadowJar{
+    archiveBaseName.set("crud-dns")
+    archiveClassifier.set('')
+    archiveVersion.set('')
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Lista de URLs</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <style>
+        .url-list {
+            padding: 0;
+        }
+
+        .url-list-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .url-base {
+            font-weight: bold;
+        }
+
+        .url-corta {
+            color: #007bff;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="../css/index.css">
+
+    <!-- Custom styles for this template -->
+    <link href="../css/sidebars.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Lista de URLs</h1>
+        <ul class="list-group">
+            <li class="list-group-item" th:each="url : ${listUrl}">
+                <div class="row">
+                    <div class="col-md-6">
+                        <a class="url-base mb-0" th:href="${url.urlBase}" th:text="${url.urlBase}"
+                            style="word-break: break-all;"></a>
+                    </div>
+
+                    <div class="col-md-6 d-flex align-items-center justify-content-between">
+                        <!-- Agrega justify-content-between para separar los elementos -->
+                        <a class="url-corta" th:href="${url.urlCorta}" th:text="${url.urlCorta}"
+                            style="word-break: break-all;"></a>
+                        <br>
+                        <a class="link" onclick="cargarEstadistica(event)"
+                            th:href="@{'/estadistica/' + ${url.codigo}}">estadistica</a>
+
+                        <th:block th:if="${usuario != null && usuario.isUser == false}">
+                            <div class="text-end">
+                                <a th:href="'/url/eliminarURL?codigoUrl=' + ${url.codigo}" type="button"
+                                    class="btn btn-danger btn-sm align-self-center">Eliminar</a>
+                            </div>
+                        </th:block>
+
+
+                    </div>
+                </div>
+            </li>
+
+        </ul>
+    </div>
+
+</body>
+
+</html>
