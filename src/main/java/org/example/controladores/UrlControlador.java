@@ -182,10 +182,12 @@ public class UrlControlador extends ControladorClass {
 
     private String obtenerContenidoServiceworker() {
         // Obtener la ruta del directorio actual
-        String rutaDirectorioActual = System.getProperty("user.dir");
+        //String rutaDirectorioActual = System.getProperty("user.dir");
 
         // Construir la ruta absoluta al archivo serviceworkers.js
-        String rutaArchivo = rutaDirectorioActual + "/src/main/resources/publico/serviceworkers.js";
+        //String rutaArchivo = rutaDirectorioActual + "/src/main/resources/publico/serviceworkers.js";
+
+        String rutaArchivo = "~/proyectoFinal/src/main/resources/publico/serviceworkers.js";
 
         // Verificar si el archivo existe
         File archivo = new File(rutaArchivo);
