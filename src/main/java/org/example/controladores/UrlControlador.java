@@ -195,7 +195,7 @@ public class UrlControlador extends ControladorClass {
         //String rutaArchivo = rutaDirectorioActual + "/src/main/resources/publico/serviceworkers.js";
 
         // Definir la ruta del archivo
-        String rutaArchivo = "/home/azureuser/proyectoFinal/src/main/resources/publico/serviceworkers.js";
+        String rutaArchivo = "/home/azureuser/practicas-icc-352/proyecto-final/src/main/resources/publico/serviceworkers.js";
 
         // Verificar si el archivo existe
         File archivo = new File(rutaArchivo);
