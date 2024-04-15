@@ -44,6 +44,7 @@ public class Main {
 		app.start(7000);
 
 
+
         new ApiControlador(app).aplicarRutas();
 		new IndexControlador(app).aplicarRutas();
 		new LoginControlador(app).aplicarRutas();
