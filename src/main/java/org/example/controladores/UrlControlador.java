@@ -187,16 +187,14 @@ public class UrlControlador extends ControladorClass {
         // Construir la ruta absoluta al archivo serviceworkers.js
         //String rutaArchivo = rutaDirectorioActual + "/src/main/resources/publico/serviceworkers.js";
 
-        String rutaArchivo = "~/proyectoFinal/src/main/resources/publico/serviceworkers.js";
+        // Definir la ruta del archivo
+        String rutaArchivo = "/home/azureuser/proyectoFinal/src/main/resources/publico/serviceworkers.js";
 
         // Verificar si el archivo existe
         File archivo = new File(rutaArchivo);
         if (!archivo.exists() || archivo.isDirectory()) {
             // Manejar el caso en el que el archivo no exista o sea un directorio
-            System.err.println("El archivo serviceworkers.js no existe en la ruta especificada."+archivo);
-            System.err.println("El archivo serviceworkers.js no existe en la ruta especificada."+archivo.getPath());
-            System.err.println("El archivo serviceworkers.js no existe en la ruta especificada."+archivo.getAbsolutePath());
-
+            System.err.println("El archivo serviceworkers.js no existe en la ruta especificada: " + rutaArchivo);
             return ""; // Retornar una cadena vacía o manejar el error de otra forma
         }
 
@@ -207,6 +205,7 @@ public class UrlControlador extends ControladorClass {
             e.printStackTrace();
             return ""; // Manejar el caso de error de lectura del archivo
         }
+
     }
 
 
