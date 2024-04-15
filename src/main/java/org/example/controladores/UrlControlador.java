@@ -193,7 +193,10 @@ public class UrlControlador extends ControladorClass {
         File archivo = new File(rutaArchivo);
         if (!archivo.exists() || archivo.isDirectory()) {
             // Manejar el caso en el que el archivo no exista o sea un directorio
-            System.err.println("El archivo serviceworkers.js no existe en la ruta especificada.");
+            System.err.println("El archivo serviceworkers.js no existe en la ruta especificada."+archivo);
+            System.err.println("El archivo serviceworkers.js no existe en la ruta especificada."+archivo.getPath());
+            System.err.println("El archivo serviceworkers.js no existe en la ruta especificada."+archivo.getAbsolutePath());
+
             return ""; // Retornar una cadena vacía o manejar el error de otra forma
         }
 
